@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+build/
+dist/
+*.spec
+
+# Just in case someone ever copies a credentials/env file into this folder —
+# it should never happen (the real one lives in ~/.claude/), but better safe.
+.credentials.json
+.credentials.json.bak
+*.env
