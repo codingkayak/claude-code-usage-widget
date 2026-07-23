@@ -113,9 +113,11 @@ Windows.
 - **Click the icon** (or right-click → Details): opens a panel with the two
   full-size bars, "5h"/"S" labels, and the CEC$/CR$ lines each with a small
   caption underneath. Click anywhere on the panel (or outside it) to close it.
-- **Notifications**: a Windows toast whenever either window crosses 80%, and
-  again at 95%. Only fires once per threshold, resets when the window itself
-  resets.
+- **Notifications**: a Windows toast whenever either window crosses 50%, 75%,
+  90%, or 100%. Each threshold fires at most once until that window actually
+  resets (detected by usage dropping back down, not by trusting the
+  undocumented endpoint's reset timestamp — see `check_thresholds` in
+  `tray_widget.py` for why).
 
 ## Language
 
