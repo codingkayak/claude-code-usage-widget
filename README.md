@@ -1,5 +1,7 @@
 # Claude Usage Widget
 
+*This is a plugin to Claude Code where you can see in your task bar 2 columns chart with the usage per session and per week.*
+
 Widget de bandeja do Windows pra acompanhar o consumo da janela de 5h e da janela
 semanal do Claude Code Pro, mais uma estimativa de custo em USD do mês corrente.
 
