@@ -92,18 +92,39 @@ pip install -r requirements.txt
 python tray_widget.py
 ```
 
-Only one instance runs at a time — if you try to open a second one, it warns
-you and exits.
+## Making it start automatically
 
-## Packaging it to always run
+Running it manually only lasts until you close it or reboot — for it to come
+back on its own after every login, add a shortcut to the Startup folder
+(`Win+R` → `shell:startup` → Enter opens that folder). Two ways to do it:
+
+**Option A — straight to the script (quicker, good while you're still tweaking
+the code):** requires Python to stay installed, but any future edit to
+`tray_widget.py` takes effect the next time it starts, no rebuild needed.
+
+```powershell
+$WshShell = New-Object -ComObject WScript.Shell
+$startupDir = [Environment]::GetFolderPath('Startup')
+$Shortcut = $WshShell.CreateShortcut((Join-Path $startupDir "ClaudeUsageWidget.lnk"))
+$Shortcut.TargetPath = (Get-Command pythonw).Source
+$Shortcut.Arguments = '"' + (Join-Path $PWD "tray_widget.py") + '"'
+$Shortcut.WorkingDirectory = "$PWD"
+$Shortcut.Save()
+```
+
+**Option B — compiled `.exe` (no Python needed on the machine, but has to be
+rebuilt after code changes):**
 
 ```powershell
 .\build.ps1
 ```
 
-This produces `dist\claude-usage-widget.exe`. Create a shortcut to it in the
-Startup folder (`Win+R` → `shell:startup`) so it starts on its own with
-Windows.
+This produces `dist\claude-usage-widget.exe`. Create a shortcut to that file
+in the Startup folder the same way (or just drag it there in Explorer).
+
+Either way, only one instance runs at a time — if the widget is already
+running and something (you, or Windows Startup) tries to open it again, it
+just warns and exits instead of stacking up duplicate tray icons.
 
 ## Usage
 
