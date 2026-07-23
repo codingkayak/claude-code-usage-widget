@@ -41,7 +41,8 @@ FAST_INTERVAL_SECONDS = 20
 COST_RESCAN_EVERY_N_TICKS = 15  # ~5 min at a 20s tick
 STALE_MINUTES_STATUSLINE = 20  # statusline is a free push during active sessions, trust it longer
 STALE_MINUTES_FALLBACK = 2  # must match NETWORK_POLL_INTERVAL_SECONDS below
-NOTIFY_THRESHOLDS = (80, 95)
+NOTIFY_THRESHOLDS = (50, 75, 90, 100)
+NOTIFY_RESET_DROP_MARGIN = 5  # pct must drop by more than this to count as "the window reset"
 
 GREEN = (34, 197, 94)
 YELLOW = (234, 179, 8)
@@ -59,13 +60,13 @@ latest = {
     "five_hour": {"used_percentage": None, "resets_at": None},
     "seven_day": {"used_percentage": None, "resets_at": None},
     "monthly_cost_usd": 0.0,  # CEC$ — estimated cost at API pricing over local token usage
-    "credits": {"enabled": False, "used_dollars": 0.0, "percent": None, "cap_dollars": None},  # CR$ — real, vem da conta
+    "credits": {"enabled": False, "used_dollars": 0.0, "percent": None, "cap_dollars": None},  # CR$ — real, comes from the account
     "degraded": False,
     "auth_expired": False,
 }
 notified = {
-    "five_hour": {"resets_at": None, "levels": set()},
-    "seven_day": {"resets_at": None, "levels": set()},
+    "five_hour": {"last_pct": None, "levels": set()},
+    "seven_day": {"last_pct": None, "levels": set()},
 }
 
 
@@ -576,18 +577,22 @@ def notify(title: str, message: str) -> None:
 
 
 def check_thresholds(rate_limits: dict) -> None:
+    """A threshold fires at most once per window. "New window" is detected by
+    pct dropping back down, not by resets_at changing — that field comes from
+    an undocumented endpoint and its microseconds drift slightly between
+    calls even within the same window, which used to make every single poll
+    look like a fresh window and re-fire every threshold every time."""
     labels = {"five_hour": t("notify_five_hour_label"), "seven_day": t("notify_weekly_label")}
     for key, label in labels.items():
         window = rate_limits.get(key) or {}
         pct = window.get("used_percentage")
-        resets_at = window.get("resets_at")
         if pct is None:
             continue
 
         tracker = notified[key]
-        if tracker["resets_at"] != resets_at:
-            tracker["resets_at"] = resets_at
+        if tracker["last_pct"] is not None and pct < tracker["last_pct"] - NOTIFY_RESET_DROP_MARGIN:
             tracker["levels"] = set()
+        tracker["last_pct"] = pct
 
         for threshold in NOTIFY_THRESHOLDS:
             if pct >= threshold and threshold not in tracker["levels"]:
