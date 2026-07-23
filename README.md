@@ -3,6 +3,24 @@
 A Windows tray widget for tracking Claude Code Pro's 5h and weekly quota, plus
 an estimated USD cost for the current month.
 
+## Screenshots
+
+<table>
+<tr>
+<td align="center"><b>Tray icon</b><br>(compact, updates live)</td>
+<td align="center"><b>Detail panel</b><br>(click the icon to open)</td>
+</tr>
+<tr>
+<td align="center"><img src="docs/tray-icon.png" width="100" alt="Tray icon with two usage bars"></td>
+<td align="center"><img src="docs/detail-panel.png" width="220" alt="Detail panel showing 5h, weekly, estimated and real cost"></td>
+</tr>
+</table>
+
+*Sample data shown above — not a real account's numbers.* Regenerate these
+with `python tools_screenshot.py` (renders straight from the same drawing
+code via PIL — no screen capture involved, so it never risks grabbing
+whatever else is on your screen).
+
 ## How it works
 
 - `statusline_writer.py` is registered as the `statusLine` command in
