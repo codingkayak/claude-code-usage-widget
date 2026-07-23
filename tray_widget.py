@@ -40,15 +40,15 @@ DEBUG_LOG_PATH = CLAUDE_HOME / "usage-widget-debug.log"
 FAST_INTERVAL_SECONDS = 20
 COST_RESCAN_EVERY_N_TICKS = 15  # ~5 min at a 20s tick
 STALE_MINUTES_STATUSLINE = 20  # statusline is a free push during active sessions, trust it longer
-STALE_MINUTES_FALLBACK = 2  # teste: precisa bater com NETWORK_POLL_INTERVAL_SECONDS abaixo
+STALE_MINUTES_FALLBACK = 2  # must match NETWORK_POLL_INTERVAL_SECONDS below
 NOTIFY_THRESHOLDS = (80, 95)
 
 GREEN = (34, 197, 94)
 YELLOW = (234, 179, 8)
 RED = (239, 68, 68)
 GRAY = (110, 110, 110)
-CLAUDE_ORANGE = (218, 119, 86)  # #DA7756, cor de marca do Claude
-BG_DARK = (38, 38, 36)  # #262624, cinza-escuro quente do tema dark do Claude
+CLAUDE_ORANGE = (218, 119, 86)  # #DA7756, Claude's brand color
+BG_DARK = (38, 38, 36)  # #262624, warm dark gray matching Claude's dark theme
 CLAUDE_ORANGE_HEX = "#%02x%02x%02x" % CLAUDE_ORANGE
 BG_DARK_HEX = "#%02x%02x%02x" % BG_DARK
 
@@ -58,7 +58,7 @@ state_lock = threading.Lock()
 latest = {
     "five_hour": {"used_percentage": None, "resets_at": None},
     "seven_day": {"used_percentage": None, "resets_at": None},
-    "monthly_cost_usd": 0.0,  # CEC$ — estimativa a preço de API sobre os tokens locais
+    "monthly_cost_usd": 0.0,  # CEC$ — estimated cost at API pricing over local token usage
     "credits": {"enabled": False, "used_dollars": 0.0, "percent": None, "cap_dollars": None},  # CR$ — real, vem da conta
     "degraded": False,
     "auth_expired": False,
@@ -175,7 +175,7 @@ def _find_window(payload: dict, name: str) -> dict:
 # call, at most once every NETWORK_POLL_INTERVAL_SECONDS — success or failure,
 # the next attempt always waits the full interval. Nice and calm.
 
-NETWORK_POLL_INTERVAL_SECONDS = 2 * 60  # teste: ver se 2 min já é agressivo demais pro endpoint
+NETWORK_POLL_INTERVAL_SECONDS = 2 * 60
 _next_attempt_allowed_at = 0.0
 
 
@@ -544,7 +544,7 @@ def draw_icon(five_hour_pct: float | None, seven_day_pct: float | None) -> Image
 
 
 def build_tooltip(data: dict) -> str:
-    """Order requested: 5h, S (semanal), CEC$ (estimado), CR$ (real)."""
+    """Order requested: 5h, S (weekly), CEC$ (estimated), CR$ (real)."""
     five_hour = data["five_hour"]
     seven_day = data["seven_day"]
     credits = data["credits"]
